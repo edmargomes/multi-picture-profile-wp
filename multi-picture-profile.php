@@ -16,7 +16,8 @@ function eg_head_scripts($hook) {
 	$hooks = ['user-new.php', 'user-edit.php', 'profile.php'];
 	if( in_array($hook,$hooks )) {
 		$translates = [
-		        'Remove' => __('Remove', 'multi-picture-profile')
+		        'Remove' => __('Remove', 'multi-picture-profile'),
+		        'set_profile' => __('Profile photo', 'multi-picture-profile'),
         ];
 		wp_enqueue_media();
 		wp_enqueue_style('multi-picture-style', plugins_url('css/style.css', __FILE__), array(), null);
@@ -32,6 +33,7 @@ add_action( 'admin_enqueue_scripts', 'eg_head_scripts' );
  */
 function eg_add_photo_profile_field($user) {
 	$attachment_ids = get_user_meta( (int)$user->ID, 'eg_pictures_ids', true );
+	$profile_picture_id = get_user_meta( (int)$user->ID, 'profilepicture', true );
 	?>
 	<table class="form-table">
 		<tbody>
@@ -46,8 +48,9 @@ function eg_add_photo_profile_field($user) {
                     foreach ($attachment_ids as $id => $attachment_id) { ?>
 	                    <div class="picture-container-profile">
                             <input type="hidden" name="eg_pictures_ids[]" value="<?= $id ?>"/>
+                            <input type="radio" name="eg_profile" value="<?= $id ?>" <?= ($profile_picture_id == $id ? 'checked' : '') ?>> <?= _e('Profile photo', 'multi-picture-profile') ?><BR>
                             <?= wp_get_attachment_image($id) ?>
-                            <button class="button"><?= _e('Remove', 'multi-picture-profile')?></button>
+                            <button class="button eg-remove"><?= _e('Remove', 'multi-picture-profile')?></button>
                         </div>
                     <?php } }?>
                 </div>
@@ -83,6 +86,8 @@ function eg_user_profile($user_id) {
 			$picture_ids[$eg_pictures_id] = 1;
 	    }
 		add_user_meta( (int)$user_id, 'eg_pictures_ids', $picture_ids); //add user meta
+		$profile_pic = empty($_POST['eg_profile']) ? '' : $_POST['eg_profile'];
+		update_user_meta($user_id, 'profilepicture', $profile_pic);
 	} else {
 		return false;
 	}
@@ -91,3 +96,32 @@ function eg_user_profile($user_id) {
 }
 add_action( 'personal_options_update', 'eg_user_profile' );
 add_action( 'edit_user_profile_update', 'eg_user_profile' );
+
+/**
+ * @param string $avatar
+ * @param $id_or_email
+ * @return mixed|string
+ */
+function eg_new_avatar( $avatar = '', $id_or_email ) {
+	$user_id = 0;
+
+	if ( is_numeric($id_or_email) ) {
+		$user_id = (int)$id_or_email;
+	} else if ( is_string($id_or_email) ) {
+		$user = get_user_by( 'email', $id_or_email );
+		$user_id = $user->id;
+	} else if ( is_object($id_or_email) ) {
+		$user_id = $id_or_email->user_id;
+	}
+	if ( $user_id == 0 ) return $avatar;
+
+	$attachment_id = (int)get_user_meta( (int)$user_id, 'profilepicture', true );
+	$image = wp_get_attachment_image_src((int)$attachment_id, 'thumbnail')[0];
+	if( empty($image) ) $avatar = '';
+
+	$avatar = preg_replace('/src=("|\').*?("|\')/i', 'src="'.$image.'"', $avatar);
+	$avatar = preg_replace('/srcset=("|\').*?("|\')/i', 'srcset="'.$image.'"', $avatar);
+
+	return $avatar;
+}
+add_filter( 'get_avatar', 'eg_new_avatar', 5, 5 );

@@ -3,6 +3,8 @@ jQuery(document).ready(($) => {
 
     multiPicture = () => {
         const $addButton = $('button.eg-upload');
+        const $setProfileButton = $('button.eg-setprofile');
+        const $removeButton = $('button.eg-remove');
 
         $addButton.on('click', event => {
             event.preventDefault();
@@ -11,8 +13,9 @@ jQuery(document).ready(($) => {
                     imageProfile = [
                         `<div class="picture-container-profile">`,
                             `<input type="hidden" name="eg_pictures_ids[]" value="${attachment.id}"/>`,
+                            `<input type="radio" name="eg_profile" value="${attachment.id}">${Translates.set_profile}<BR>`,
                             `<img data-id="${attachment.id}" class="eg-thumb" src="${attachment.sizes.thumbnail.url}" alt="${attachment.title}"/>`,
-                            `<button class="button">${Translates.Remove}</button>`,
+                            `<button class="button eg-remove">${Translates.Remove}</button>`,
                         `<div>`
                     ].join('');
                     //Add thumbs image
@@ -22,6 +25,19 @@ jQuery(document).ready(($) => {
 
             wp.media.editor.open();
         });
+
+        $setProfileButton.each(function ($element, a) {
+            $(a).on('click', (event) => {
+                $(this).parent().addClass('selected')
+                return false;
+            })
+        })
+
+        $removeButton.each (function ($element, a){
+            $(a).on('click', (event) => {
+                $(this).parent().remove();
+            })
+        })
     }
 
     multiPicture();
