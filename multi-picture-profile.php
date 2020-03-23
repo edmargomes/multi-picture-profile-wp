@@ -12,7 +12,8 @@
 */
 
 function eg_head_scripts($hook) {
-	$hooks = ['user-new.php', 'user-edit.php'];
+
+	$hooks = ['user-new.php', 'user-edit.php', 'profile.php'];
 	if( in_array($hook,$hooks )) {
 		$translates = [
 		        'Remove' => __('Remove', 'multi-picture-profile')
@@ -34,7 +35,7 @@ function eg_add_photo_profile_field($user) {
 		<tbody>
 		<tr>
 			<th>
-				<label for="eg-upload-images"><?php _e('Profile Photos', 'multi-picture-profile'); ?></label>
+				<label for="eg-upload-images"><?php __('Profile Photos', 'multi-picture-profile'); ?></label>
 			</th>
 			<td>
                 <div class="eg-images">
