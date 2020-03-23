@@ -11,6 +11,15 @@
 * License: GPL2
 */
 
+function eg_head_scripts($hook) {
+	$hooks = ['user-new.php', 'user-edit.php'];
+	if( in_array($hook,$hooks )) {
+		wp_enqueue_media();
+		wp_enqueue_script( 'ajax-script', plugins_url( 'js/scripts.js', __FILE__ ), array( 'jquery' ), '0.1', true );
+	}
+}
+add_action( 'admin_enqueue_scripts', 'eg_head_scripts' );
+
 /**
  * Add profile field to upload images to profile.
  * @param $user
@@ -25,7 +34,7 @@ function eg_add_photo_profile_field($user) {
 			</th>
 			<td>
 				<div class="wp-media-buttons">
-					<button class="button" id="eg-upload-images"><?php _e('Add', 'multi-picture-profile'); ?></button>
+					<button class="button eg-upload" id="eg-upload-images"><?php _e('Add', 'multi-picture-profile'); ?></button>
 					<button class="button"><?php _e('Remove', 'multi-picture-profile'); ?></button>
 				</div>
 			</td>
@@ -36,3 +45,4 @@ function eg_add_photo_profile_field($user) {
 }
 add_action( 'show_user_profile', 'eg_add_photo_profile_field' );
 add_action( 'edit_user_profile', 'eg_add_photo_profile_field' );
+add_action( 'user_new_form', 'eg_add_photo_profile_field' );
