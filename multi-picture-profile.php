@@ -21,6 +21,7 @@ function eg_head_scripts($hook) {
 	wp_enqueue_style('multi-picture-style', plugins_url('css/style.css', __FILE__), array(), null);
 	wp_enqueue_script( 'multi-picture', plugins_url( 'js/scripts.js', __FILE__ ), array( 'jquery' ), '0.1', true );
 	wp_localize_script( 'multi-picture', 'Translates', $translates );
+	wp_localize_script( 'multi-picture', 'pluginSettings', get_option( 'multi_picture_profile_settings_option_name' ));
 }
 add_action( 'admin_enqueue_scripts', 'eg_head_scripts' );
 add_action( 'wp_enqueue_scripts', 'eg_head_scripts' );
@@ -182,7 +183,6 @@ class MultiPictureProfileSettings {
 		<div class="wrap">
 			<h2>Multi Picture Profile Settings</h2>
 			<p>Setting Picture Profile</p>
-			<?php settings_errors(); ?>
 
 			<form method="post" action="options.php">
 				<?php

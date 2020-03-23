@@ -5,9 +5,11 @@ jQuery(document).ready(($) => {
         const $addButton = $('button.eg-upload');
         const $setProfileButton = $('button.eg-setprofile');
         const $removeButton = $('button.eg-remove');
+        const maxImages = pluginSettings.maximum_profile_images || -1
 
         $addButton.on('click', event => {
             event.preventDefault();
+
             wp.media.editor.send.attachment = (props, attachment) => {
                 if (attachment.type == "image") {
                     imageProfile = [
@@ -19,7 +21,8 @@ jQuery(document).ready(($) => {
                         `<div>`
                     ].join('');
                     //Add thumbs image
-                    $('div.eg-images').append(imageProfile)
+                    if (maxImages == -1 || $('div.eg-images > div').length < maxImages)
+                        $('div.eg-images').append(imageProfile)
                 }
             };
 
