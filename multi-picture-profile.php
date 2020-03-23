@@ -148,3 +148,95 @@ function show_user_photo_profile_in_order($order) {
 }
 add_action( 'woocommerce_order_details_before_order_table', 'show_user_photo_profile_in_order');
 add_action( 'woocommerce_admin_order_data_after_order_details', 'show_user_photo_profile_in_order');
+
+/**
+ * @internal never define functions inside callbacks.
+ * these functions could be run multiple times; this would result in a fatal error.
+ */
+
+/**
+ * Class MultiPictureProfileSettings
+ * Add settings to this plugin
+ */
+class MultiPictureProfileSettings {
+	private $multi_picture_profile_settings_options;
+
+	public function __construct() {
+		add_action( 'admin_menu', array( $this, 'multi_picture_profile_settings_add_plugin_page' ) );
+		add_action( 'admin_init', array( $this, 'multi_picture_profile_settings_page_init' ) );
+	}
+
+	public function multi_picture_profile_settings_add_plugin_page() {
+		add_options_page(
+			'Multi Picture Profile Settings', // page_title
+			'Multi Picture Profile Settings', // menu_title
+			'manage_options', // capability
+			'multi-picture-profile-settings', // menu_slug
+			array( $this, 'multi_picture_profile_settings_create_admin_page' ) // function
+		);
+	}
+
+	public function multi_picture_profile_settings_create_admin_page() {
+		$this->multi_picture_profile_settings_options = get_option( 'multi_picture_profile_settings_option_name' ); ?>
+
+		<div class="wrap">
+			<h2>Multi Picture Profile Settings</h2>
+			<p>Setting Picture Profile</p>
+			<?php settings_errors(); ?>
+
+			<form method="post" action="options.php">
+				<?php
+				settings_fields( 'multi_picture_profile_settings_option_group' );
+				do_settings_sections( 'multi-picture-profile-settings-admin' );
+				submit_button();
+				?>
+			</form>
+		</div>
+	<?php }
+
+	public function multi_picture_profile_settings_page_init() {
+		register_setting(
+			'multi_picture_profile_settings_option_group', // option_group
+			'multi_picture_profile_settings_option_name', // option_name
+			array( $this, 'multi_picture_profile_settings_sanitize' ) // sanitize_callback
+		);
+
+		add_settings_section(
+			'multi_picture_profile_settings_setting_section', // id
+			'Settings', // title
+			array( $this, 'multi_picture_profile_settings_section_info' ), // callback
+			'multi-picture-profile-settings-admin' // page
+		);
+
+		add_settings_field(
+			'maximum_profile_images', // id
+			'Maximum profile images', // title
+			array( $this, 'maximum_profile_images_callback' ), // callback
+			'multi-picture-profile-settings-admin', // page
+			'multi_picture_profile_settings_setting_section' // section
+		);
+	}
+
+	public function multi_picture_profile_settings_sanitize($input) {
+		$sanitary_values = array();
+		if ( isset( $input['maximum_profile_images'] ) ) {
+			$sanitary_values['maximum_profile_images'] = sanitize_text_field( $input['maximum_profile_images'] );
+		}
+
+		return $sanitary_values;
+	}
+
+	public function multi_picture_profile_settings_section_info() {
+
+	}
+
+	public function maximum_profile_images_callback() {
+		printf(
+			'<input class="regular-text" type="text" name="multi_picture_profile_settings_option_name[maximum_profile_images]" id="maximum_profile_images" value="%s">',
+			isset( $this->multi_picture_profile_settings_options['maximum_profile_images'] ) ? esc_attr( $this->multi_picture_profile_settings_options['maximum_profile_images']) : ''
+		);
+	}
+
+}
+if ( is_admin() )
+	$multi_picture_profile_settings = new MultiPictureProfileSettings();
