@@ -13,27 +13,26 @@
 
 function eg_head_scripts($hook) {
 
-	$hooks = ['user-new.php', 'user-edit.php', 'profile.php'];
-	if( in_array($hook,$hooks )) {
-		$translates = [
-		        'Remove' => __('Remove', 'multi-picture-profile'),
-		        'set_profile' => __('Profile photo', 'multi-picture-profile'),
-        ];
-		wp_enqueue_media();
-		wp_enqueue_style('multi-picture-style', plugins_url('css/style.css', __FILE__), array(), null);
-		wp_enqueue_script( 'multi-picture', plugins_url( 'js/scripts.js', __FILE__ ), array( 'jquery' ), '0.1', true );
-		wp_localize_script( 'multi-picture', 'Translates', $translates );
-	}
+	$translates = [
+		'Remove' => __('Remove', 'multi-picture-profile'),
+		'set_profile' => __('Profile photo', 'multi-picture-profile'),
+	];
+	wp_enqueue_media();
+	wp_enqueue_style('multi-picture-style', plugins_url('css/style.css', __FILE__), array(), null);
+	wp_enqueue_script( 'multi-picture', plugins_url( 'js/scripts.js', __FILE__ ), array( 'jquery' ), '0.1', true );
+	wp_localize_script( 'multi-picture', 'Translates', $translates );
 }
 add_action( 'admin_enqueue_scripts', 'eg_head_scripts' );
+add_action( 'wp_enqueue_scripts', 'eg_head_scripts' );
 
 /**
  * Add profile field to upload images to profile.
  * @param $user
  */
 function eg_add_photo_profile_field($user) {
-	$attachment_ids = get_user_meta( (int)$user->ID, 'eg_pictures_ids', true );
-	$profile_picture_id = get_user_meta( (int)$user->ID, 'profilepicture', true );
+	$attachment_ids = get_user_meta( $user->ID ?? get_current_user_id() , 'eg_pictures_ids', true );
+	$profile_picture_id = get_user_meta( $user->ID ?? get_current_user_id(), 'profilepicture', true );
+
 	?>
 	<table class="form-table">
 		<tbody>
@@ -66,6 +65,7 @@ function eg_add_photo_profile_field($user) {
 add_action( 'show_user_profile', 'eg_add_photo_profile_field' );
 add_action( 'edit_user_profile', 'eg_add_photo_profile_field' );
 add_action( 'user_new_form', 'eg_add_photo_profile_field' );
+add_action( 'woocommerce_edit_account_form_start', 'eg_add_photo_profile_field' );
 
 /**
  * Save profile pictures.
@@ -96,6 +96,7 @@ function eg_user_profile($user_id) {
 }
 add_action( 'personal_options_update', 'eg_user_profile' );
 add_action( 'edit_user_profile_update', 'eg_user_profile' );
+add_action( 'woocommerce_update_customer', 'eg_user_profile' );
 
 /**
  * @param string $avatar
