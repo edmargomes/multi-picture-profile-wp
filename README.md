@@ -1,6 +1,10 @@
 # Multi picture profile
 
+## Add many photos in the profile
 ![](img/multipictureprofile.gif)
+
+## Save current profile photo in the order
+![](img/SaveOrderWithCurrentProfile.gif)
 
 This plugin allows the user to insert more than one profile photo
 
