@@ -126,3 +126,25 @@ function eg_new_avatar( $avatar = '', $id_or_email ) {
 	return $avatar;
 }
 add_filter( 'get_avatar', 'eg_new_avatar', 5, 5 );
+
+/**
+ * Save profile picture in order.
+ * @param $user_id
+ */
+function eg_save_current_avatar_in_order($order) {
+
+	$profile_picture_id = get_user_meta( get_current_user_id(), 'profilepicture', true );
+	$order->update_meta_data( 'user_avatar', $profile_picture_id );
+}
+add_action('woocommerce_checkout_create_order', 'eg_save_current_avatar_in_order');
+
+/**
+ * @param $order
+ */
+function show_user_photo_profile_in_order($order) {
+	$photo = $order->get_meta('user_avatar', true);
+	echo ('<h2 class="woocommerce-order-details__title">' . __( 'User photo', 'multi-picture-profile' ) . '</h2>');
+	echo wp_get_attachment_image( $photo );
+}
+add_action( 'woocommerce_order_details_before_order_table', 'show_user_photo_profile_in_order');
+add_action( 'woocommerce_admin_order_data_after_order_details', 'show_user_photo_profile_in_order');
