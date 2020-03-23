@@ -6,6 +6,9 @@
 ## Save current profile photo in the order
 ![](img/SaveOrderWithCurrentProfile.gif)
 
+## Settings
+![](img/settings.gif)
+
 This plugin allows the user to insert more than one profile photo
 
 ## Installation

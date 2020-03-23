@@ -240,3 +240,12 @@ class MultiPictureProfileSettings {
 }
 if ( is_admin() )
 	$multi_picture_profile_settings = new MultiPictureProfileSettings();
+
+add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'add_action_links' );
+
+function add_action_links ( $links ) {
+	$mylinks = array(
+		'<a href="' . admin_url( 'options-general.php?page=multi-picture-profile-settings' ) . '">Settings</a>',
+	);
+	return array_merge( $mylinks, $links );
+}
